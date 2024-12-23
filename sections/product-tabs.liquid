@@ -1,0 +1,183 @@
+<div class="product-tabs">
+  <style>
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.75rem;
+      margin-top: 2.0rem;
+      border-bottom: 2px solid rgba(29, 29, 29, 0.15);
+    }
+
+    .tab {
+      font-size: {{ section.settings.tab_font_size }}px;
+      font-weight: {{ section.settings.tab_font_weight }};
+      color: {{ section.settings.tab_color }};
+      cursor: pointer;
+      position: relative;
+      padding-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .tab.active {
+      color: {{ section.settings.tab_active_color }};
+    }
+
+    .tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: {{ section.settings.tab_indicator_color }};
+    }
+
+    .tab-content {
+      display: none;
+      line-height: 1.5;
+      font-size: {{ section.settings.content_font_size }}px;
+      padding-top: 20px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+
+  <div class="tabs">
+    {% for block in section.blocks %}
+      <div class="tab" id="tab{{ forloop.index }}" onclick="switchTab(event, 'content{{ forloop.index }}')">
+        {{ block.settings.tab_title }}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% for block in section.blocks %}
+    <div id="content{{ forloop.index }}" class="tab-content">
+      {{ block.settings.tab_content }}
+    </div>
+  {% endfor %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("tab1").click();
+    });
+
+    function switchTab(evt, tabName) {
+      let tabcontent = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+
+      let tablinks = document.getElementsByClassName("tab");
+      for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
+</div>
+
+{% schema %}
+{
+  "name": "Product Tabs",
+  "settings": [
+    {
+      "type": "range",
+      "id": "tab_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tab Font Size",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "tab_font_weight",
+      "label": "Tab Font Weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "tab_color",
+      "label": "Tab Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_color",
+      "label": "Active Tab Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_indicator_color",
+      "label": "Tab Indicator Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "content_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Content Font Size",
+      "default": 16
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab Title",
+          "default": "Tab"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_content",
+          "label": "Tab Content",
+          "default": "<p>Tab content goes here</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Tabs",
+      "blocks": [
+        {
+          "type": "tab"
+        },
+        {
+          "type": "tab"
+        },
+        {
+          "type": "tab"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

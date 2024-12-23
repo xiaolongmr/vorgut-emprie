@@ -1,0 +1,297 @@
+{%- liquid
+  assign section_width = section.settings.section_width
+-%}
+
+{%- style -%}
+  /* FAQ部分的基本样式 */
+  .faq-section {
+    padding: 60px 0;
+  }
+
+  .faq-section.faq--regular {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-section.faq--wide {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 标题样式 */
+  .section-title {
+    margin-bottom: {{ section.settings.title_margin_bottom }}px;
+    text-align: {{ section.settings.title_alignment }};
+    font-size: {{ section.settings.title_size }}px;
+    color: {{ section.settings.title_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-title {
+      font-size: {{ section.settings.title_size_mobile }}px;
+      margin-bottom: {{ section.settings.title_margin_bottom_mobile }}px;
+    }
+  }
+
+  /* 问答样式 */
+  .faq-item {
+    border-bottom: 1px solid {{ section.settings.border_color }};
+    margin-bottom: 10px;
+  }
+
+  /* 问题按钮样式 */
+  .faq-question {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: {{ section.settings.question_bg }};
+    color: {{ section.settings.question_color }};
+    border: none;
+    cursor: pointer;
+    font-size: {{ section.settings.question_size }}px;
+  }
+
+  /* 答案容器样式 */
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: {{ section.settings.answer_bg }};
+    color: {{ section.settings.answer_color }};
+    padding: 0 20px;
+  }
+
+  /* 展开状态的答案样式 */
+  .faq-answer.active {
+    max-height: 500px;
+    padding: 20px;
+  }
+
+  /* 加号图标样式 */
+  .icon-plus {
+    transition: transform 0.3s ease;
+  }
+
+  .faq-question.active .icon-plus {
+    transform: rotate(45deg);
+  }
+{%- endstyle -%}
+
+<div class="faq-section page-width {% if section_width == 'regular' %}faq--regular{% else %}faq--wide{% endif %}">
+  {% if section.settings.title != blank %}
+    <h2 class="section-title">{{ section.settings.title }}</h2>
+  {% endif %}
+
+  <div class="faq-container">
+    {%- for block in section.blocks -%}
+      <div class="faq-item" {{ block.shopify_attributes }}>
+        <button class="faq-question">
+          <span>{{ block.settings.question }}</span>
+          <svg class="icon-plus" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M8 0v16M0 8h16" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          {{ block.settings.answer }}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const answer = question.nextElementSibling;
+      question.classList.toggle('active');
+      answer.classList.toggle('active');
+      
+      if ({{ section.settings.close_others }}) {
+        const otherQuestions = document.querySelectorAll('.faq-question:not(.active)');
+        otherQuestions.forEach(otherQuestion => {
+          otherQuestion.classList.remove('active');
+          otherQuestion.nextElementSibling.classList.remove('active');
+        });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "FAQ部分",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "部分宽度",
+      "options": [
+        {
+          "value": "regular",
+          "label": "常规"
+        },
+        {
+          "value": "wide",
+          "label": "宽"
+        }
+      ],
+      "default": "regular"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "标题",
+      "default": "常见问题"
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "标题对齐方式",
+      "options": [
+        {
+          "value": "left",
+          "label": "左对齐"
+        },
+        {
+          "value": "center",
+          "label": "居中"
+        },
+        {
+          "value": "right",
+          "label": "右对齐"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "标题字体大小",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "移动端标题字体大小",
+      "min": 14,
+      "max": 48,
+      "step": 1,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "标题颜色",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "label": "标题下方间距",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom_mobile",
+      "label": "移动端标题下方间距",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "问题文字颜色",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "question_bg",
+      "label": "问题背景颜色",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "答案文字颜色",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "answer_bg",
+      "label": "答案背景颜色",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "边框颜色",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "range",
+      "id": "question_size",
+      "label": "问题字体大小",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "close_others",
+      "label": "点击时关闭其他答案",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ项目",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "问题",
+          "default": "在这里输入你的问题"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "答案",
+          "default": "<p>在这里输入你的答案</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ部分",
+      "blocks": [
+        {
+          "type": "faq"
+        },
+        {
+          "type": "faq"
+        },
+        {
+          "type": "faq"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
